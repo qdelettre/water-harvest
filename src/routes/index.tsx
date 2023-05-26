@@ -1,112 +1,138 @@
-import { component$ } from '@builder.io/qwik';
-import type { DocumentHead } from '@builder.io/qwik-city';
+import { Runoff } from "../constants/runoff";
+import { useSignal, useTask$ } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
+import type { DocumentHead } from "@builder.io/qwik-city";
+import { routeLoader$ } from "@builder.io/qwik-city";
+import {
+  type InitialValues,
+  useForm,
+  zodForm$,
+  getValues,
+  getErrors,
+} from "@modular-forms/qwik";
+import { NumberInput } from "~/components/number-input/number-input";
+import { Select } from "~/components/select/select";
+import type { DataForm } from "~/forms/data";
+import { dataFormSchema } from "~/forms/data";
+import { HeroSpanContainer } from "~/styled/hero/hero-container.css";
+import { HeroText } from "~/styled/hero/hero-text.css";
 
-import Counter from '~/components/starter/counter/counter';
-import Hero from '~/components/starter/hero/hero';
-import Infobox from '~/components/starter/infobox/infobox';
-import Starter from '~/components/starter/next-steps/next-steps';
+const runoffs = {
+  [Runoff.AsphaltShingleRoof]: 0.8,
+  [Runoff.MetalRoof]: 0.7,
+  [Runoff.ConcreteTileRoof]: 0.625,
+  [Runoff.ClayTileRoof]: 0.625,
+  [Runoff.SlateRoof]: 0.55,
+  [Runoff.WoodShakeOrShingleRoof]: 0.55,
+} as const;
+
+export const useFormLoader = routeLoader$<InitialValues<DataForm>>(() => ({
+  surface: undefined,
+  rainfall: undefined,
+  runoff: undefined,
+}));
 
 export default component$(() => {
+  const [form, { Form, Field }] = useForm<DataForm>({
+    loader: useFormLoader(),
+    validate: zodForm$(dataFormSchema),
+    validateOn: "input",
+  });
+
+  const water = useSignal<number>(0);
+
+  useTask$(({ track }) => {
+    console.log(getErrors(form));
+    if (
+      track(() => form.dirty) &&
+      track(() => dataFormSchema.safeParse(getValues(form)).success)
+    ) {
+      const values = getValues(form);
+      water.value =
+        values.rainfall! * values.surface! * runoffs[values.runoff!];
+    }
+  });
+
   return (
     <>
-      <Hero />
-      <Starter />
+      <main class="container">
+        <article class="grid">
+          <div>
+            <hgroup>
+              <h1>Estimate a water harvest</h1>
+              <h2>Find out how much water you can have yearly</h2>
+            </hgroup>
+            <Form>
+              <Field name="surface" type="number">
+                {(field, props) => (
+                  <NumberInput
+                    {...props}
+                    label="Roof surface"
+                    placeholder="Your roof surface (m3)"
+                    step={0.1}
+                    min={0.1}
+                    value={field.value}
+                    error={field.error}
+                    dirty={field.dirty}
+                    required
+                  />
+                )}
+              </Field>
 
-      <div role="presentation" class="ellipsis"></div>
-      <div role="presentation" class="ellipsis ellipsis-purple"></div>
+              <Field name="rainfall" type="number">
+                {(field, props) => (
+                  <NumberInput
+                    {...props}
+                    label="Annual rainfall"
+                    placeholder="Annual rainfall (in mm)"
+                    step={0.1}
+                    min={0.1}
+                    value={field.value}
+                    error={field.error}
+                    dirty={field.dirty}
+                    required
+                  />
+                )}
+              </Field>
 
-      <div class="container container-center container-spacing-xl">
-        <h3>
-          You can <span class="highlight">count</span>
-          <br /> on me
-        </h3>
-        <Counter />
-      </div>
-
-      <div class="container container-flex">
-        <Infobox>
-          <div q:slot="title" class="icon icon-cli">
-            CLI Commands
+              <Field type="string" name="runoff">
+                {(field, props) => (
+                  <Select
+                    {...props}
+                    label="Roof type"
+                    placeholder="Roof type"
+                    value={field.value}
+                    error={field.error}
+                    dirty={field.dirty}
+                    required
+                    hint="Roof type is a LS (loss factor)"
+                    options={Object.keys(runoffs).map((label) => ({
+                      label,
+                      value: label,
+                    }))}
+                  />
+                )}
+              </Field>
+            </Form>
           </div>
-          <>
-            <p>
-              <code>npm run dev</code>
-              <br />
-              Starts the development server and watches for changes
-            </p>
-            <p>
-              <code>npm run preview</code>
-              <br />
-              Creates production build and starts a server to preview it
-            </p>
-            <p>
-              <code>npm run build</code>
-              <br />
-              Creates production build
-            </p>
-            <p>
-              <code>npm run qwik add</code>
-              <br />
-              Runs the qwik CLI to add integrations
-            </p>
-          </>
-        </Infobox>
-
-        <div>
-          <Infobox>
-            <div q:slot="title" class="icon icon-apps">
-              Example Apps
-            </div>
-            <p>
-              Have a look at the <a href="/demo/flower">Flower App</a> or the{' '}
-              <a href="/demo/todolist">Todo App</a>.
-            </p>
-          </Infobox>
-
-          <Infobox>
-            <div q:slot="title" class="icon icon-community">
-              Community
-            </div>
-            <ul>
-              <li>
-                <span>Questions or just want to say hi? </span>
-                <a href="https://qwik.builder.io/chat" target="_blank">
-                  Chat on discord!
-                </a>
-              </li>
-              <li>
-                <span>Follow </span>
-                <a href="https://twitter.com/QwikDev" target="_blank">
-                  @QwikDev
-                </a>
-                <span> on Twitter</span>
-              </li>
-              <li>
-                <span>Open issues and contribute on </span>
-                <a href="https://github.com/BuilderIO/qwik" target="_blank">
-                  GitHub
-                </a>
-              </li>
-              <li>
-                <span>Watch </span>
-                <a href="https://qwik.builder.io/media/" target="_blank">
-                  Presentations, Podcasts, Videos, etc.
-                </a>
-              </li>
-            </ul>
-          </Infobox>
-        </div>
-      </div>
+          <HeroSpanContainer>
+            <HeroText>
+              {water.value}
+              m3
+            </HeroText>
+          </HeroSpanContainer>
+        </article>
+      </main>
     </>
   );
 });
 
 export const head: DocumentHead = {
-  title: 'Welcome to Qwik',
+  title: "Water harvest",
   meta: [
     {
-      name: 'description',
-      content: 'Qwik site description',
+      name: "description",
+      content: "Havest water : estimate your harvest",
     },
   ],
 };
