@@ -1,0 +1,13 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "timezone": "Europe/Paris",
+  "schedule": ["before 8am", "after 10pm"],
+  "stabilityDays": 1,
+  "packageRules": [
+    {
+      "groupName": "qwik",
+      "matchPackagePrefixes": ["@builder.io/", "eslint-plugin-qwik"]
+    }
+  ]
+}
