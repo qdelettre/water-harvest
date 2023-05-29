@@ -44,12 +44,16 @@ export const NumberInput = component$(
     hint,
     ...props
   }: NumberInputProps) => {
-    const ariaProps = useSignal({});
+    const ariaProps = useSignal<Record<string, unknown>>({});
 
     useTask$(({ track }) => {
       track(() => error);
       track(() => dirty);
-      ariaProps.value = error ? { "aria-invalid": true } : {};
+      if (ariaProps.value["aria-invalid"] && !error) {
+        ariaProps.value = { "aria-invalid": false };
+      } else {
+        ariaProps.value = error?.length ? { "aria-invalid": true } : {};
+      }
     });
 
     return (

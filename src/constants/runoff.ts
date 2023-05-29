@@ -1,4 +1,4 @@
-export const Runoff = {
+export const RUNOFF = {
   AsphaltShingleRoof: "Asphalt Shingle Roof",
   MetalRoof: "Metal Roof",
   ConcreteTileRoof: "Concrete Tile Roof",
