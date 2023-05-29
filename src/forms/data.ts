@@ -1,4 +1,4 @@
-import { Runoff } from "~/constants/runoff";
+import { RUNOFF } from "~/constants/runoff";
 import { z } from "zod";
 
 const positiveErrorMessage = "Please enter a positive value";
@@ -15,7 +15,7 @@ const baseField = z
 export const dataFormSchema = z.object({
   surface: baseField.step(0.1),
   rainfall: baseField,
-  runoff: z.nativeEnum(Runoff),
+  runoff: z.nativeEnum(RUNOFF),
 });
 
 export type DataForm = z.infer<typeof dataFormSchema>;

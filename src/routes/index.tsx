@@ -1,4 +1,4 @@
-import { Runoff } from "../constants/runoff";
+import { RUNOFF_FACTOR } from "../constants/runoff-factor";
 import { useSignal, useTask$ } from "@builder.io/qwik";
 import { component$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
@@ -8,7 +8,6 @@ import {
   useForm,
   zodForm$,
   getValues,
-  getErrors,
 } from "@modular-forms/qwik";
 import { NumberInput } from "~/components/number-input/number-input";
 import { Select } from "~/components/select/select";
@@ -16,15 +15,6 @@ import type { DataForm } from "~/forms/data";
 import { dataFormSchema } from "~/forms/data";
 import { HeroSpanContainer } from "~/styled/hero/hero-container.css";
 import { HeroText } from "~/styled/hero/hero-text.css";
-
-const runoffs = {
-  [Runoff.AsphaltShingleRoof]: 0.8,
-  [Runoff.MetalRoof]: 0.7,
-  [Runoff.ConcreteTileRoof]: 0.625,
-  [Runoff.ClayTileRoof]: 0.625,
-  [Runoff.SlateRoof]: 0.55,
-  [Runoff.WoodShakeOrShingleRoof]: 0.55,
-} as const;
 
 export const useFormLoader = routeLoader$<InitialValues<DataForm>>(() => ({
   surface: undefined,
@@ -42,14 +32,13 @@ export default component$(() => {
   const water = useSignal<number>(0);
 
   useTask$(({ track }) => {
-    console.log(getErrors(form));
     if (
       track(() => form.dirty) &&
       track(() => dataFormSchema.safeParse(getValues(form)).success)
     ) {
       const values = getValues(form);
       water.value =
-        values.rainfall! * values.surface! * runoffs[values.runoff!];
+        values.rainfall! * values.surface! * RUNOFF_FACTOR[values.runoff!];
     }
   });
 
@@ -106,7 +95,7 @@ export default component$(() => {
                     dirty={field.dirty}
                     required
                     hint="Roof type is a LS (loss factor)"
-                    options={Object.keys(runoffs).map((label) => ({
+                    options={Object.keys(RUNOFF_FACTOR).map((label) => ({
                       label,
                       value: label,
                     }))}
@@ -117,7 +106,7 @@ export default component$(() => {
           </div>
           <HeroSpanContainer>
             <HeroText>
-              {water.value}
+              {water.value.toFixed(2)}
               m3
             </HeroText>
           </HeroSpanContainer>
