@@ -45,7 +45,7 @@
     "vite-tsconfig-paths": "4.2.0"
   },
   "dependencies": {
-    "@modular-forms/qwik": "^0.16.0",
+    "@modular-forms/qwik": "^0.17.0",
     "@picocss/pico": "1.5.10",
     "zod": "^3.21.4"
   }
