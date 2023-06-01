@@ -1,7 +1,15 @@
 @use "@picocss/pico";
 
+:root {
+  --block-spacing-vertical: var(--spacing);
+}
+
 html {
   body {
     height: 100%;
   }
+}
+
+.logo {
+  line-height: var(--line-height);
 }

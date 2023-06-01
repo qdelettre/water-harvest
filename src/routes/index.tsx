@@ -8,25 +8,49 @@ import {
   useForm,
   zodForm$,
   getValues,
+  formAction$,
 } from "@modular-forms/qwik";
 import { NumberInput } from "~/components/number-input/number-input";
 import { Select } from "~/components/select/select";
+import { TextInput } from "~/components/text-input/text-iput";
 import type { DataForm } from "~/forms/data";
 import { dataFormSchema } from "~/forms/data";
+import { Type, getRainfall } from "~/services/rainfall/rainfall";
 import { HeroSpanContainer } from "~/styled/hero/hero-container.css";
 import { HeroText } from "~/styled/hero/hero-text.css";
 
 export const useFormLoader = routeLoader$<InitialValues<DataForm>>(() => ({
   surface: undefined,
-  rainfall: undefined,
   runoff: undefined,
+  location: {
+    lat: undefined,
+    long: undefined,
+  },
 }));
 
+export const useFormAction = formAction$<DataForm, { rainfall: number }>(
+  async (values) => {
+    // Runs on server
+    const { location } = values;
+    const stats = await getRainfall({ ...location, type: Type.LastYearAvg });
+    return {
+      status: "success",
+      data: {
+        rainfall:
+          stats.daily.precipitation_sum.reduce((a, b) => a! + b!, 0) || 0,
+      },
+    };
+  },
+  zodForm$(dataFormSchema)
+);
+
 export default component$(() => {
-  const [form, { Form, Field }] = useForm<DataForm>({
+  const [form, { Form, Field }] = useForm<DataForm, { rainfall: number }>({
     loader: useFormLoader(),
     validate: zodForm$(dataFormSchema),
+    action: useFormAction(),
     validateOn: "input",
+    revalidateOn: "input",
   });
 
   const water = useSignal<number>(0);
@@ -36,82 +60,98 @@ export default component$(() => {
       track(() => form.dirty) &&
       track(() => dataFormSchema.safeParse(getValues(form)).success)
     ) {
-      const values = getValues(form);
-      water.value =
-        values.rainfall! * values.surface! * RUNOFF_FACTOR[values.runoff!];
+      form.element?.requestSubmit();
+    }
+  });
+
+  useTask$(({ track }) => {
+    track(() => form.response.data);
+    if (form.response.data) {
+      const { rainfall } = form.response.data;
+      const { surface, runoff } = getValues(form);
+      water.value = (rainfall * surface! * RUNOFF_FACTOR[runoff!]) / 1000;
     }
   });
 
   return (
     <>
-      <main class="container">
-        <article class="grid">
-          <div>
-            <hgroup>
-              <h1>Estimate a water harvest</h1>
-              <h2>Find out how much water you can have yearly</h2>
-            </hgroup>
-            <Form>
-              <Field name="surface" type="number">
-                {(field, props) => (
-                  <NumberInput
-                    {...props}
-                    label="Roof surface"
-                    placeholder="Your roof surface (m3)"
-                    step={0.1}
-                    min={0.1}
-                    value={field.value}
-                    error={field.error}
-                    dirty={field.dirty}
-                    required
-                  />
-                )}
-              </Field>
+      <article class="grid">
+        <div>
+          <hgroup>
+            <h1>Estimate a water harvest</h1>
+            <h2>Find out how much water you can have yearly</h2>
+          </hgroup>
+          <Form>
+            <Field name="surface" type="number">
+              {(field, props) => (
+                <NumberInput
+                  {...props}
+                  label="Roof surface"
+                  placeholder="Your roof surface (m3)"
+                  step={0.1}
+                  min={0.1}
+                  value={field.value}
+                  error={field.error}
+                  dirty={field.dirty}
+                  required
+                />
+              )}
+            </Field>
 
-              <Field name="rainfall" type="number">
-                {(field, props) => (
-                  <NumberInput
-                    {...props}
-                    label="Annual rainfall"
-                    placeholder="Annual rainfall (in mm)"
-                    step={0.1}
-                    min={0.1}
-                    value={field.value}
-                    error={field.error}
-                    dirty={field.dirty}
-                    required
-                  />
-                )}
-              </Field>
+            <Field type="string" name="location.lat">
+              {(field, props) => (
+                <TextInput
+                  {...props}
+                  label="Lat"
+                  type="text"
+                  placeholder="Latitude"
+                  value={field.value}
+                  error={field.error}
+                  dirty={field.dirty}
+                  required
+                />
+              )}
+            </Field>
+            <Field type="string" name="location.long">
+              {(field, props) => (
+                <TextInput
+                  {...props}
+                  label="Long"
+                  type="text"
+                  placeholder="Longitude"
+                  value={field.value}
+                  error={field.error}
+                  dirty={field.dirty}
+                  required
+                />
+              )}
+            </Field>
 
-              <Field type="string" name="runoff">
-                {(field, props) => (
-                  <Select
-                    {...props}
-                    label="Roof type"
-                    placeholder="Roof type"
-                    value={field.value}
-                    error={field.error}
-                    dirty={field.dirty}
-                    required
-                    hint="Roof type is a LS (loss factor)"
-                    options={Object.keys(RUNOFF_FACTOR).map((label) => ({
-                      label,
-                      value: label,
-                    }))}
-                  />
-                )}
-              </Field>
-            </Form>
-          </div>
-          <HeroSpanContainer>
-            <HeroText>
-              {water.value.toFixed(2)}
-              m3
-            </HeroText>
-          </HeroSpanContainer>
-        </article>
-      </main>
+            <Field type="string" name="runoff">
+              {(field, props) => (
+                <Select
+                  {...props}
+                  label="Roof type"
+                  placeholder="Roof type"
+                  value={field.value}
+                  error={field.error}
+                  dirty={field.dirty}
+                  required
+                  hint="Roof type is a LS (loss factor)"
+                  options={Object.keys(RUNOFF_FACTOR).map((label) => ({
+                    label,
+                    value: label,
+                  }))}
+                />
+              )}
+            </Field>
+          </Form>
+        </div>
+        <HeroSpanContainer>
+          <HeroText>{water.value.toFixed(2)} m3</HeroText>
+          {!!water.value && <i>Last year at this location</i>}
+        </HeroSpanContainer>
+      </article>
     </>
   );
 });
