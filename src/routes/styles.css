@@ -1,0 +1,11 @@
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+  flex-wrap: wrap;
+}
+
+span.heart {
+  color: var(--del-color);
+}
