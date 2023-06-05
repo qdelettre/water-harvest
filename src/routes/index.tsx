@@ -1,5 +1,5 @@
 import { RUNOFF_FACTOR } from "../constants/runoff-factor";
-import { useSignal, useTask$ } from "@builder.io/qwik";
+import { useComputed$, useSignal, useTask$ } from "@builder.io/qwik";
 import { component$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
@@ -9,12 +9,15 @@ import {
   zodForm$,
   getValues,
   formAction$,
+  validate,
+  setValues,
 } from "@modular-forms/qwik";
 import { NumberInput } from "~/components/number-input/number-input";
 import { Select } from "~/components/select/select";
 import { TextInput } from "~/components/text-input/text-iput";
 import type { DataForm } from "~/forms/data";
 import { dataFormSchema } from "~/forms/data";
+import { useGeolocalisation } from "~/hooks/useGeolocalisation";
 import { Type, getRainfall } from "~/services/rainfall/rainfall";
 import { HeroSpanContainer } from "~/styled/hero/hero-container.css";
 import { HeroText } from "~/styled/hero/hero-text.css";
@@ -45,6 +48,8 @@ export const useFormAction = formAction$<DataForm, { rainfall: number }>(
 );
 
 export default component$(() => {
+  const { position } = useGeolocalisation();
+
   const [form, { Form, Field }] = useForm<DataForm, { rainfall: number }>({
     loader: useFormLoader(),
     validate: zodForm$(dataFormSchema),
@@ -65,7 +70,20 @@ export default component$(() => {
   });
 
   useTask$(({ track }) => {
-    track(() => form.response.data);
+    const coords = track(() => position.value);
+    if (coords) {
+      const [lat, long] = coords;
+      setValues(form, {
+        location: {
+          lat: lat.toString(),
+          long: long.toString(),
+        },
+      });
+      validate(form, ["location.lat", "location.long"]);
+    }
+  });
+
+  useComputed$(() => {
     if (form.response.data) {
       const { rainfall } = form.response.data;
       const { surface, runoff } = getValues(form);
