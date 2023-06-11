@@ -1,5 +1,3 @@
-import { URLSearchParams } from "url";
-
 export interface Response {
   latitude: number;
   longitude: number;
