@@ -18,13 +18,13 @@ type SelectProps = {
   onChange$: PropFunction<
     (
       event: QwikChangeEvent<HTMLSelectElement>,
-      element: HTMLSelectElement
+      element: HTMLSelectElement,
     ) => void
   >;
   onBlur$: PropFunction<
     (
       event: QwikFocusEvent<HTMLSelectElement>,
-      element: HTMLSelectElement
+      element: HTMLSelectElement,
     ) => void
   >;
   options: { label: string; value: string }[];
@@ -81,5 +81,5 @@ export const Select = component$(
         {error && <FormError>{error}</FormError>}
       </>
     );
-  }
+  },
 );

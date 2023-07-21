@@ -15,5 +15,5 @@ export const InputLabel = component$(
         </label>
       )}
     </>
-  )
+  ),
 );

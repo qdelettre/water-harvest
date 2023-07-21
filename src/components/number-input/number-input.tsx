@@ -26,7 +26,7 @@ type NumberInputProps = {
   onChange$: PropFunction<
     (
       event: QwikChangeEvent<HTMLInputElement>,
-      element: HTMLInputElement
+      element: HTMLInputElement,
     ) => void
   >;
   onBlur$: PropFunction<
@@ -72,5 +72,5 @@ export const NumberInput = component$(
         {error && <FormError>{error}</FormError>}
       </>
     );
-  }
+  },
 );

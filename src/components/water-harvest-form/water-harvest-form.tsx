@@ -95,5 +95,5 @@ export const WaterHarvestForm = component$<WaterHarvestFormProps>(
         </Field>
       </>
     );
-  }
+  },
 );

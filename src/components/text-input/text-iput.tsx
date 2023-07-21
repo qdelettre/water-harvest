@@ -23,7 +23,7 @@ type TextInputProps = {
   onChange$: PropFunction<
     (
       event: QwikChangeEvent<HTMLInputElement>,
-      element: HTMLInputElement
+      element: HTMLInputElement,
     ) => void
   >;
   onBlur$: PropFunction<
@@ -57,5 +57,5 @@ export const TextInput = component$(
         {error && <FormError>{error}</FormError>}
       </div>
     );
-  }
+  },
 );

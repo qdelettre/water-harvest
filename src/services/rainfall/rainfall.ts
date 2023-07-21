@@ -34,7 +34,7 @@ const baseURL = "https://archive-api.open-meteo.com/v1";
 
 const fetchData = async (
   path: string,
-  params: Record<string, string>
+  params: Record<string, string>,
 ): Promise<Response> => {
   const url = `${baseURL}/${path}?${new URLSearchParams(params)}`;
   const response = await fetch(decodeURI(url));
