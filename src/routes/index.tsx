@@ -49,7 +49,7 @@ export default component$(() => {
     const shouldSubmit: boolean = track(
       () =>
         form.dirty &&
-        WATER_HARVEST_FORM_SCHEMA.safeParse(getValues(form)).success
+        WATER_HARVEST_FORM_SCHEMA.safeParse(getValues(form)).success,
     );
     if (shouldSubmit) {
       form.element?.requestSubmit();

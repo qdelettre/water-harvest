@@ -15,7 +15,7 @@ export const getStats = (data: number[]): Stats | never => {
       acc.max = Math.max(acc.max, num);
       return acc;
     },
-    { sum: 0, min: 0, max: 0 }
+    { sum: 0, min: 0, max: 0 },
   );
 
   return {

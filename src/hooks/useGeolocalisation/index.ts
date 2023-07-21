@@ -31,7 +31,7 @@ export function useGeolocalisation(): HookReturnType {
     },
     {
       strategy: "document-ready",
-    }
+    },
   );
 
   return {
