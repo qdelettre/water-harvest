@@ -36,7 +36,7 @@
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-qwik": "^1.2.6",
     "eslint-plugin-unused-imports": "^3.0.0",
-    "prettier": "3.0.0",
+    "prettier": "3.0.1",
     "sass": "^1.63.3",
     "styled-vanilla-extract": "^0.5.4",
     "typescript": "5.1.6",
