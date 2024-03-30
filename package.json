@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@modular-forms/qwik": "^0.21.0",
-    "@picocss/pico": "2.0.0",
+    "@picocss/pico": "2.0.6",
     "zod": "^3.21.4"
   }
 }
