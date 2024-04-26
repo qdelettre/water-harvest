@@ -41,7 +41,7 @@
     "styled-vanilla-extract": "^0.5.4",
     "typescript": "5.4.5",
     "undici": "5.28.4",
-    "vercel": "^33.0.0",
+    "vercel": "^34.0.0",
     "vite": "4.5.3",
     "vite-tsconfig-paths": "4.3.2"
   },
