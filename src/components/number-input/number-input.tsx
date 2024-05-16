@@ -1,11 +1,5 @@
-import {
-  component$,
-  useSignal,
-  type PropFunction,
-  type QwikChangeEvent,
-  type QwikFocusEvent,
-  useTask$,
-} from "@builder.io/qwik";
+import type { QRL } from "@builder.io/qwik";
+import { component$, useSignal, useTask$ } from "@builder.io/qwik";
 import { InputLabel } from "../input-label/input-label";
 import { Hint } from "../hint/hint";
 import { FormError } from "~/styled/form-error/form-error.css";
@@ -21,17 +15,10 @@ type NumberInputProps = {
   dirty?: boolean;
   hint?: string;
   min?: number;
-  ref: PropFunction<(element: Element) => void>;
-  onInput$: PropFunction<(event: Event, element: HTMLInputElement) => void>;
-  onChange$: PropFunction<
-    (
-      event: QwikChangeEvent<HTMLInputElement>,
-      element: HTMLInputElement,
-    ) => void
-  >;
-  onBlur$: PropFunction<
-    (event: QwikFocusEvent<HTMLInputElement>, element: HTMLInputElement) => void
-  >;
+  ref: QRL<(element: HTMLInputElement) => void>;
+  onInput$: (event: Event, element: HTMLInputElement) => void;
+  onChange$: (event: Event, element: HTMLInputElement) => void;
+  onBlur$: (event: Event, element: HTMLInputElement) => void;
 };
 
 export const NumberInput = component$(
@@ -52,7 +39,7 @@ export const NumberInput = component$(
       if (ariaProps.value["aria-invalid"] && !error) {
         ariaProps.value = { "aria-invalid": false };
       } else {
-        ariaProps.value = error?.length ? { "aria-invalid": true } : {};
+        ariaProps.value = error.length ? { "aria-invalid": true } : {};
       }
     });
 

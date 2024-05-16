@@ -1,32 +1,16 @@
-import {
-  component$,
-  useSignal,
-  type PropFunction,
-  type QwikChangeEvent,
-  type QwikFocusEvent,
-  useTask$,
-} from "@builder.io/qwik";
+import type { QRL } from "@builder.io/qwik";
+import { component$, useSignal, useTask$ } from "@builder.io/qwik";
 import { InputLabel } from "../input-label/input-label";
 import { Hint } from "../hint/hint";
 import { FormError } from "~/styled/form-error/form-error.css";
 
 type SelectProps = {
-  ref: PropFunction<(element: Element) => void>;
+  ref: QRL<(element: HTMLSelectElement) => void>;
   name: string;
   value: string | string[] | null | undefined;
-  onInput$: PropFunction<(event: Event, element: HTMLSelectElement) => void>;
-  onChange$: PropFunction<
-    (
-      event: QwikChangeEvent<HTMLSelectElement>,
-      element: HTMLSelectElement,
-    ) => void
-  >;
-  onBlur$: PropFunction<
-    (
-      event: QwikFocusEvent<HTMLSelectElement>,
-      element: HTMLSelectElement,
-    ) => void
-  >;
+  onInput$: (event: Event, element: HTMLSelectElement) => void;
+  onChange$: (event: Event, element: HTMLSelectElement) => void;
+  onBlur$: (event: Event, element: HTMLSelectElement) => void;
   options: { label: string; value: string }[];
   multiple?: boolean;
   size?: number;
@@ -46,11 +30,13 @@ export const Select = component$(
     const values = useSignal<string[]>();
     useTask$(({ track }) => {
       track(() => value);
-      values.value = Array.isArray(value)
-        ? value
-        : value && typeof value === "string"
-        ? [value]
-        : [];
+      if (Array.isArray(value)) {
+        values.value = value;
+      } else if (value && typeof value === "string") {
+        values.value = [value];
+      } else {
+        values.value = [];
+      }
     });
 
     return (
