@@ -57,7 +57,7 @@ export default component$(() => {
   });
 
   useTask$(({ track }) => {
-    const data = track(() => form.response?.data);
+    const data = track(() => form.response.data);
     if (data) {
       const { rainfall } = data;
       const { surface, runoff } = getValues(form);

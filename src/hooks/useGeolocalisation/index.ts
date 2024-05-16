@@ -12,10 +12,11 @@ export function useGeolocalisation(): HookReturnType {
   const hasError = useSignal(false);
   const position = useSignal<[number, number]>();
 
+  // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(
     () => {
-      const navigator = window?.navigator;
-      isSupported.value = !!navigator?.geolocation;
+      const navigator = window.navigator;
+      isSupported.value = !!navigator.geolocation;
 
       function success({ coords }: GeolocationPosition) {
         position.value = [coords.latitude, coords.longitude];
@@ -25,9 +26,7 @@ export function useGeolocalisation(): HookReturnType {
         hasError.value = true;
       }
 
-      if (isSupported.value) {
-        navigator.geolocation.getCurrentPosition(success, error);
-      }
+      navigator.geolocation.getCurrentPosition(success, error);
     },
     {
       strategy: "document-ready",

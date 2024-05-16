@@ -1,8 +1,4 @@
-import type {
-  PropFunction,
-  QwikChangeEvent,
-  QwikFocusEvent,
-} from "@builder.io/qwik";
+import type { QRL } from "@builder.io/qwik";
 import { useSignal, useTask$ } from "@builder.io/qwik";
 import { component$ } from "@builder.io/qwik";
 import { FormError } from "~/styled/form-error/form-error.css";
@@ -18,17 +14,10 @@ type TextInputProps = {
   dirty?: boolean;
   error: string;
   required?: boolean;
-  ref: PropFunction<(element: Element) => void>;
-  onInput$: PropFunction<(event: Event, element: HTMLInputElement) => void>;
-  onChange$: PropFunction<
-    (
-      event: QwikChangeEvent<HTMLInputElement>,
-      element: HTMLInputElement,
-    ) => void
-  >;
-  onBlur$: PropFunction<
-    (event: QwikFocusEvent<HTMLInputElement>, element: HTMLInputElement) => void
-  >;
+  ref: QRL<(element: HTMLInputElement) => void>;
+  onInput$: (event: Event, element: HTMLInputElement) => void;
+  onChange$: (event: Event, element: HTMLInputElement) => void;
+  onBlur$: (event: Event, element: HTMLInputElement) => void;
 };
 
 export const TextInput = component$(
@@ -41,7 +30,7 @@ export const TextInput = component$(
       if (ariaProps.value["aria-invalid"] && !error) {
         ariaProps.value = { "aria-invalid": false };
       } else {
-        ariaProps.value = error?.length ? { "aria-invalid": true } : {};
+        ariaProps.value = error.length ? { "aria-invalid": true } : {};
       }
     });
 
