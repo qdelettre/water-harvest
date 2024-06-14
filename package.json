@@ -52,7 +52,7 @@
     "vite-tsconfig-paths": "^4.2.1"
   },
   "dependencies": {
-    "@modular-forms/qwik": "^0.24.0",
+    "@modular-forms/qwik": "^0.25.0",
     "@picocss/pico": "^2.0.6",
     "zod": "^3.23.8"
   }
