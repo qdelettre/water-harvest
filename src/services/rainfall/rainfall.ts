@@ -39,10 +39,6 @@ const fetchData = async (
   const url = `${baseURL}/${path}?${new URLSearchParams(params)}`;
   const response = await fetch(decodeURI(url));
 
-  if (!response.ok) {
-    throw new Error(response.statusText);
-  }
-
   return response.json() as unknown as Response;
 };
 
