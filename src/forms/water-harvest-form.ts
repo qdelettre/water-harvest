@@ -54,13 +54,22 @@ export const useFormAction = formAction$<
 >(async (values) => {
   // Runs on server
   const { location } = values;
-  const stats = await getRainfall({ ...location, type: Type.LastYearAvg });
-  return {
-    status: "success",
-    data: {
-      rainfall: stats.daily.precipitation_sum.reduce((a, b) => a! + b!, 0) || 0,
-    },
-  };
+
+  try {
+    const stats = await getRainfall({ ...location, type: Type.LastYearAvg });
+    return {
+      status: "success",
+      data: {
+        rainfall:
+          stats.daily.precipitation_sum.reduce((a, b) => a! + b!, 0) || 0,
+      },
+    };
+  } catch (exception: unknown) {
+    return {
+      status: "error",
+      message: JSON.stringify(exception),
+    };
+  }
 }, zodForm$(WATER_HARVEST_FORM_SCHEMA));
 
 export type WaterHarvestFormStore = FormStore<
